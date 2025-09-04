@@ -470,7 +470,7 @@ server.listen(PORT, HOST, () => {
   console.log(`WebSocket server ready for connections`);
   console.log(`Web app available at http://localhost:${PORT}`);
   console.log(`Operator mode: http://localhost:${PORT}/operator`);
-  console.log(`Network access: http://192.168.0.192:${PORT}`);
+  console.log(`Network access: http://${getLocalIP()}:${PORT}`);
 });
 
 // Graceful shutdown

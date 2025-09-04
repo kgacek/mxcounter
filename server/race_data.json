@@ -1,0 +1,322 @@
+{
+  "races": [
+    {
+      "id": "default",
+      "name": "Default Race",
+      "riders": [
+        {
+          "id": "1756926522013",
+          "number": "212",
+          "name": "Marek",
+          "class": "Cross",
+          "laps": 7,
+          "position": 1,
+          "lastLapTime": 1756930099710,
+          "previousLapTime": 105924,
+          "isActive": true
+        },
+        {
+          "id": "1756926511711",
+          "number": "211",
+          "name": "Krzychu",
+          "class": "Cross",
+          "laps": 5,
+          "position": 2,
+          "lastLapTime": 1756930097725,
+          "previousLapTime": 102540,
+          "isActive": true
+        },
+        {
+          "id": "1756926552953",
+          "number": "102",
+          "name": "ktos",
+          "class": "Junior",
+          "laps": 0,
+          "position": 1,
+          "lastLapTime": null,
+          "previousLapTime": null,
+          "isActive": true
+        },
+        {
+          "id": "1756976208657",
+          "number": "212",
+          "name": "Krzysztof",
+          "class": "Cross",
+          "laps": 0,
+          "position": 4,
+          "lastLapTime": null,
+          "previousLapTime": null,
+          "isActive": true
+        }
+      ],
+      "isRunning": true,
+      "startTime": 1756929922314,
+      "currentLap": 7,
+      "maxLaps": 20
+    },
+    {
+      "id": "1756976196099",
+      "name": "wyscig cross - test 1",
+      "riders": [
+        {
+          "id": "1756976225718",
+          "number": "211",
+          "name": "Krzysztof",
+          "class": "Cross",
+          "laps": 2,
+          "position": 16,
+          "lastLapTime": 1756976778811,
+          "previousLapTime": 107428,
+          "isActive": true
+        },
+        {
+          "id": "1756976312860",
+          "number": "121",
+          "name": "Maciek",
+          "class": "Cross",
+          "laps": 3,
+          "position": 1,
+          "lastLapTime": 1756976779547,
+          "previousLapTime": 106345,
+          "isActive": true
+        },
+        {
+          "id": "1756976242982",
+          "number": "101",
+          "name": "Piotr",
+          "class": "Cross",
+          "laps": 3,
+          "position": 2,
+          "lastLapTime": 1756976781013,
+          "previousLapTime": 108991,
+          "isActive": true
+        },
+        {
+          "id": "1756976233956",
+          "number": "212",
+          "name": "Marek",
+          "class": "Cross",
+          "laps": 3,
+          "position": 3,
+          "lastLapTime": 1756976781653,
+          "previousLapTime": 107855,
+          "isActive": true
+        },
+        {
+          "id": "1756976337996",
+          "number": "109",
+          "name": "Krysia",
+          "class": "Cross",
+          "laps": 3,
+          "position": 4,
+          "lastLapTime": 1756976782395,
+          "previousLapTime": 107071,
+          "isActive": true
+        },
+        {
+          "id": "1756976458352",
+          "number": "306",
+          "name": "Grzesiek",
+          "class": "Cross",
+          "laps": 3,
+          "position": 5,
+          "lastLapTime": 1756976783787,
+          "previousLapTime": 106850,
+          "isActive": true
+        },
+        {
+          "id": "1756976429245",
+          "number": "208",
+          "name": "Dominik",
+          "class": "Cross",
+          "laps": 3,
+          "position": 6,
+          "lastLapTime": 1756976784443,
+          "previousLapTime": 108276,
+          "isActive": true
+        },
+        {
+          "id": "1756976530965",
+          "number": "292",
+          "name": "Janusz",
+          "class": "Cross",
+          "laps": 3,
+          "position": 7,
+          "lastLapTime": 1756976786980,
+          "previousLapTime": 107457,
+          "isActive": true
+        },
+        {
+          "id": "1756976555312",
+          "number": "294",
+          "name": "Piter",
+          "class": "Cross",
+          "laps": 3,
+          "position": 8,
+          "lastLapTime": 1756976787762,
+          "previousLapTime": 110127,
+          "isActive": true
+        },
+        {
+          "id": "1756976468784",
+          "number": "123",
+          "name": "Seba",
+          "class": "Cross",
+          "laps": 3,
+          "position": 9,
+          "lastLapTime": 1756976789244,
+          "previousLapTime": 108944,
+          "isActive": true
+        },
+        {
+          "id": "1756976540590",
+          "number": "293",
+          "name": "Pawel",
+          "class": "Cross",
+          "laps": 3,
+          "position": 10,
+          "lastLapTime": 1756976789950,
+          "previousLapTime": 108246,
+          "isActive": true
+        },
+        {
+          "id": "1756976487177",
+          "number": "234",
+          "name": "Andrzej",
+          "class": "Cross",
+          "laps": 3,
+          "position": 11,
+          "lastLapTime": 1756976790884,
+          "previousLapTime": 108047,
+          "isActive": true
+        },
+        {
+          "id": "1756976499446",
+          "number": "987",
+          "name": "Dariusz",
+          "class": "Cross",
+          "laps": 3,
+          "position": 12,
+          "lastLapTime": 1756976791548,
+          "previousLapTime": 108193,
+          "isActive": true
+        },
+        {
+          "id": "1756976513911",
+          "number": "293",
+          "name": "Andrzej J",
+          "class": "Cross",
+          "laps": 3,
+          "position": 13,
+          "lastLapTime": 1756976792238,
+          "previousLapTime": 108297,
+          "isActive": true
+        },
+        {
+          "id": "1756976303296",
+          "number": "12",
+          "name": "Jerzy",
+          "class": "Cross",
+          "laps": 3,
+          "position": 14,
+          "lastLapTime": 1756976793019,
+          "previousLapTime": 108314,
+          "isActive": true
+        },
+        {
+          "id": "1756976443245",
+          "number": "302",
+          "name": "Alan",
+          "class": "Cross",
+          "laps": 3,
+          "position": 15,
+          "lastLapTime": 1756976794264,
+          "previousLapTime": 108943,
+          "isActive": true
+        },
+        {
+          "id": "1756976269215",
+          "number": "44",
+          "name": "Michał",
+          "class": "Junior",
+          "laps": 3,
+          "position": 1,
+          "lastLapTime": 1756976796944,
+          "previousLapTime": 106444,
+          "isActive": true
+        },
+        {
+          "id": "1756976325526",
+          "number": "30",
+          "name": "Jan",
+          "class": "Junior",
+          "laps": 3,
+          "position": 2,
+          "lastLapTime": 1756976798466,
+          "previousLapTime": 107198,
+          "isActive": true
+        },
+        {
+          "id": "1756976374394",
+          "number": "333",
+          "name": "Benek",
+          "class": "Junior",
+          "laps": 3,
+          "position": 3,
+          "lastLapTime": 1756976799787,
+          "previousLapTime": 106563,
+          "isActive": true
+        },
+        {
+          "id": "1756976288014",
+          "number": "33",
+          "name": "Adam",
+          "class": "Junior",
+          "laps": 3,
+          "position": 4,
+          "lastLapTime": 1756976800322,
+          "previousLapTime": 108328,
+          "isActive": true
+        },
+        {
+          "id": "1756976395911",
+          "number": "202",
+          "name": "Karol",
+          "class": "Junior",
+          "laps": 3,
+          "position": 5,
+          "lastLapTime": 1756976801210,
+          "previousLapTime": 107459,
+          "isActive": true
+        },
+        {
+          "id": "1756976410341",
+          "number": "211",
+          "name": "Seba",
+          "class": "Junior",
+          "laps": 3,
+          "position": 6,
+          "lastLapTime": 1756976801842,
+          "previousLapTime": 107386,
+          "isActive": true
+        },
+        {
+          "id": "1756976361196",
+          "number": "110",
+          "name": "Mikołaj",
+          "class": "Junior",
+          "laps": 3,
+          "position": 7,
+          "lastLapTime": 1756976802594,
+          "previousLapTime": 107401,
+          "isActive": true
+        }
+      ],
+      "isRunning": false,
+      "startTime": 1756976630584,
+      "currentLap": 3,
+      "maxLaps": 20
+    }
+  ],
+  "currentRaceId": "1756976196099"
+}

@@ -67,5 +67,4 @@ android/app/release/
 *.orig.*
 web-build/
 
-# Server data files (optional - remove if you want to track race data)
-server/race_data.json
+
