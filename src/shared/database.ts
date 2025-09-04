@@ -43,12 +43,12 @@ class RaceDatabase {
 
   private connect() {
     try {
-      // Connect to WebSocket server using computer's IP address
-      // This allows phones on the same network to connect
-      const serverUrl = window.location.hostname === 'localhost'
-        ? 'ws://localhost:3001'
-        : `ws://${window.location.hostname}:3001`;
-
+      // Connect to WebSocket server
+      // Allow override via environment variable or use current hostname
+      const hostname = (window as any).MXCOUNTER_SERVER_HOST || window.location.hostname;
+      const serverUrl = `ws://${hostname}:8765`;
+      
+      console.log('Attempting to connect to WebSocket server:', serverUrl);
       this.ws = new WebSocket(serverUrl);
 
       this.ws.onopen = () => {

@@ -462,7 +462,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8765;
 const HOST = '0.0.0.0'; // Bind to all network interfaces
 
 server.listen(PORT, HOST, () => {

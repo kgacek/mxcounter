@@ -77,9 +77,9 @@ npm start
 ```
 
 The application will be available at:
-- **Viewer Mode**: http://localhost:3001
-- **Operator Mode**: http://localhost:3001/operator
-- **Network Access**: http://[your-ip]:3001
+- **Viewer Mode**: http://localhost:8765
+- **Operator Mode**: http://localhost:8765/operator
+- **Network Access**: http://[your-ip]:8765
 
 ## Usage
 
@@ -102,7 +102,9 @@ The application will be available at:
 ## Deployment
 
 ### Local Network Deployment
-The server is configured to bind to `0.0.0.0:3001`, making it accessible on your local network.
+The server is configured to bind to `0.0.0.0:8765`, making it accessible on your local network.
+
+**Security Note**: The application uses port 8765 by default, which is less common than standard ports (80, 443, 3000, etc.). This reduces the risk of automated scanning attacks. For production deployment, consider using a reverse proxy (nginx, Apache) with SSL/TLS termination.
 
 ### Production Deployment
 1. **Build the application**:
@@ -129,7 +131,7 @@ The server is configured to bind to `0.0.0.0:3001`, making it accessible on your
    ```
 
 ### Environment Variables
-- `PORT`: Server port (default: 3001)
+- `PORT`: Server port (default: 8765)
 - `HOST`: Server host (default: 0.0.0.0)
 
 ## File Structure
