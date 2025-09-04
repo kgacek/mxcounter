@@ -1,55 +1,32 @@
 {
   "name": "mxcounter",
   "version": "1.0.0",
-  "description": "Motocross Lap Counter Mobile App",
+  "description": "Motocross Lap Counter PWA",
   "main": "index.js",
   "scripts": {
-    "start": "react-native start",
-    "android": "react-native run-android",
-    "ios": "react-native run-ios",
-    "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "start": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "echo \"Error: no lint specified\" && exit 1"
   },
+  "keywords": ["motocross", "lap-counter", "pwa", "react"],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^1.24.0",
-    "@react-navigation/bottom-tabs": "^6.5.11",
-    "@react-navigation/native": "^6.1.9",
-    "@react-navigation/stack": "^6.3.20",
     "react": "^18.2.0",
-    "react-native": "0.73.6",
-    "react-native-csv": "^0.2.0",
-    "react-native-fs": "^2.20.0",
-    "react-native-gesture-handler": "^2.15.0",
-    "react-native-keep-awake": "^4.0.0",
-    "react-native-reanimated": "^3.7.0",
-    "react-native-safe-area-context": "^4.9.0",
-    "react-native-screens": "^3.29.0",
-    "react-native-share": "^12.2.0",
-    "react-native-vector-icons": "^10.1.0"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
-    "@babel/runtime": "^7.20.0",
-    "@react-native/eslint-config": "^0.73.2",
-    "@react-native/metro-config": "^0.73.5",
-    "@react-native/typescript-config": "^0.73.1",
     "@types/react": "^18.2.6",
-    "@types/react-test-renderer": "^18.0.0",
-    "babel-jest": "^29.6.3",
-    "eslint": "^8.19.0",
-    "jest": "^29.6.3",
-    "metro-react-native-babel-preset": "0.76.8",
-    "prettier": "2.8.8",
-    "react-test-renderer": "18.2.0",
-    "typescript": "5.0.4"
-  },
-  "keywords": [
-    "motocross",
-    "lap-counter",
-    "racing",
-    "react-native",
-    "mobile-app"
-  ],
-  "author": "Your Name",
-  "license": "MIT"
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0",
+    "webpack-dev-server": "^4.15.0",
+    "html-webpack-plugin": "^5.5.0",
+    "ts-loader": "^9.4.0",
+    "css-loader": "^6.8.0",
+    "style-loader": "^3.3.0"
+  }
 }
+
