@@ -109,8 +109,10 @@ function updatePositionsOnly(race) {
   Object.keys(ridersByClass).forEach(className => {
     const classRiders = ridersByClass[className];
     const sortedClassRiders = classRiders.sort((a, b) => {
+      // First sort by number of laps (descending)
       if (a.laps !== b.laps) return b.laps - a.laps;
-      if (a.lastLapTime && b.lastLapTime) return a.lastLapTime - b.lastLapTime;
+      // Then sort by total time (ascending - fastest time first)
+      if (a.totalTime !== b.totalTime) return a.totalTime - b.totalTime;
       return 0;
     });
 
@@ -144,8 +146,10 @@ function updatePositions(race) {
   Object.keys(ridersByClass).forEach(className => {
     const classRiders = ridersByClass[className];
     const sortedClassRiders = classRiders.sort((a, b) => {
+      // First sort by number of laps (descending)
       if (a.laps !== b.laps) return b.laps - a.laps;
-      if (a.lastLapTime && b.lastLapTime) return a.lastLapTime - b.lastLapTime;
+      // Then sort by total time (ascending - fastest time first)
+      if (a.totalTime !== b.totalTime) return a.totalTime - b.totalTime;
       return 0;
     });
 
@@ -168,6 +172,162 @@ function updateCurrentLap(race) {
   } else {
     const maxLaps = Math.max(...race.riders.map(rider => rider.laps), 0);
     race.currentLap = maxLaps;
+  }
+}
+
+function generateFinalResultsHTML(race) {
+  const startTime = race.startTime ? new Date(race.startTime).toLocaleString() : 'Not started';
+  const raceName = race.name || 'Unknown Race';
+  
+  // Group riders by class and sort them
+  const ridersByClass = {};
+  race.riders.forEach(rider => {
+    if (!ridersByClass[rider.class]) {
+      ridersByClass[rider.class] = [];
+    }
+    ridersByClass[rider.class].push(rider);
+  });
+
+  let html = `
+    <div class="race-result">
+      <h2>${raceName} - start: ${startTime}</h2>
+  `;
+
+  Object.keys(ridersByClass).forEach(className => {
+    const classRiders = ridersByClass[className].sort((a, b) => {
+      if (a.laps !== b.laps) return b.laps - a.laps;
+      if (a.totalTime !== b.totalTime) return a.totalTime - b.totalTime;
+      return 0;
+    });
+
+    html += `
+      <h3>Klasa ${className}</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Pozycja</th>
+            <th>Imię</th>
+            <th>Czasy Okrążeń</th>
+            <th>Łączny Czas</th>
+            <th>Średni Czas</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    classRiders.forEach((rider, index) => {
+      const position = index + 1;
+      const lapTimesStr = rider.lapTimes && rider.lapTimes.length > 0 
+        ? rider.lapTimes.map(time => formatLapTime(time)).join(', ')
+        : 'Brak okrążeń';
+      const totalTimeStr = formatLapTime(rider.totalTime);
+      const displayName = `${rider.name}#${rider.number}`;
+      const avgMs = rider.laps > 0 ? Math.floor((rider.totalTime || 0) / rider.laps) : null;
+      const avgStr = avgMs ? formatLapTime(avgMs) : '--:--';
+
+      html += `
+        <tr>
+          <td class="position">${position}</td>
+          <td class="name">${displayName}</td>
+          <td class="lap-times">${lapTimesStr}</td>
+          <td class="total-time">${totalTimeStr}</td>
+          <td class="avg-time">${avgStr}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+        </tbody>
+      </table>
+    `;
+  });
+
+  html += `</div>`;
+  return html;
+}
+
+function formatLapTime(duration) {
+  if (!duration) return '--:--';
+  
+  const minutes = Math.floor(duration / 60000);
+  const seconds = Math.floor((duration % 60000) / 1000);
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function appendFinalResults(race) {
+  try {
+    const resultsHTML = generateFinalResultsHTML(race);
+    
+    let existingContent = '';
+    let isNewFile = false;
+    
+    if (fs.existsSync('final_results.html')) {
+      existingContent = fs.readFileSync('final_results.html', 'utf8');
+    } else {
+      isNewFile = true;
+    }
+
+    const baseHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Wyniki Końcowe - MxCounter</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { color: #333; text-align: center; margin-bottom: 30px; }
+    .race-result { background: white; margin-bottom: 30px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .race-result h2 { color: #2196F3; margin-bottom: 20px; border-bottom: 2px solid #2196F3; padding-bottom: 10px; }
+    .race-result h3 { color: #FFD700; margin: 20px 0 10px 0; }
+    .results-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .results-table th, .results-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    .results-table th { background-color: #f8f9fa; font-weight: bold; color: #333; }
+    .results-table tr:hover { background-color: #f5f5f5; }
+    .position { font-weight: bold; color: #2196F3; }
+    .name { font-weight: 600; }
+    .lap-times { font-family: 'Courier New', monospace; font-size: 0.9em; }
+    .total-time { font-family: 'Courier New', monospace; font-weight: bold; color: #4CAF50; }
+    .no-results { text-align: center; color: #666; font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Wyniki Końcowe</h1>
+`;
+
+    const closingHTML = `
+  </div>
+</body>
+</html>`;
+
+    let newContent;
+    
+    if (isNewFile) {
+      // Create new file with first results
+      newContent = baseHTML + resultsHTML + closingHTML;
+    } else {
+      // Extract existing race results from the file
+      const startMarker = '<h1>Wyniki Końcowe</h1>';
+      const endMarker = '</div>';
+      
+      const startIndex = existingContent.indexOf(startMarker);
+      const endIndex = existingContent.lastIndexOf(endMarker);
+      
+      if (startIndex !== -1 && endIndex !== -1) {
+        // Extract existing content between the markers
+        const existingResults = existingContent.substring(startIndex + startMarker.length, endIndex);
+        // Create new content with existing results + new results
+        newContent = baseHTML + existingResults + resultsHTML + closingHTML;
+      } else {
+        // Fallback: create new file
+        newContent = baseHTML + resultsHTML + closingHTML;
+      }
+    }
+    
+    fs.writeFileSync('final_results.html', newContent);
+    console.log(`Final results appended for race: ${race.name}`);
+  } catch (error) {
+    console.error('Error appending final results:', error);
   }
 }
 
@@ -203,6 +363,7 @@ wss.on('connection', (ws) => {
             id: Date.now().toString(),
             name: data.name.trim(),
             riders: [],
+            classes: [],
             isRunning: false,
             startTime: null,
             currentLap: 0,
@@ -251,9 +412,11 @@ wss.on('connection', (ws) => {
               id: Date.now().toString(),
               number: data.number.trim(),
               name: data.name.trim(),
-              class: data.class || 'Cross',
+              class: (data.class || '').trim(),
               laps: 0,
               position: currentRace.riders.length + 1,
+              lapTimes: [],
+              totalTime: 0,
               lastLapTime: null,
               previousLapTime: null,
               isActive: true
@@ -290,7 +453,7 @@ wss.on('connection', (ws) => {
               if (rider.id === data.riderId) {
                 // Calculate the duration of the lap that was just completed
                 let lapDuration = null;
-                if (rider.lastLapTime && raceForLap.startTime) {
+                if (raceForLap.startTime) {
                   // For the first lap, calculate time from race start to first lap completion
                   if (rider.laps === 0) {
                     lapDuration = currentTime - raceForLap.startTime;
@@ -300,9 +463,17 @@ wss.on('connection', (ws) => {
                   }
                 }
                 
+                // Add the lap duration to the lapTimes array
+                const newLapTimes = [...(rider.lapTimes || []), lapDuration];
+                
+                // Calculate total time by summing all lap times
+                const newTotalTime = newLapTimes.reduce((sum, time) => sum + (time || 0), 0);
+                
                 return {
                   ...rider,
                   laps: rider.laps + 1,
+                  lapTimes: newLapTimes,
+                  totalTime: newTotalTime,
                   previousLapTime: lapDuration, // Store the duration of the completed lap
                   lastLapTime: currentTime // Set new current lap time
                 };
@@ -324,11 +495,38 @@ wss.on('connection', (ws) => {
           if (raceForRemoveLap && raceForRemoveLap.isRunning) {
             raceForRemoveLap.riders = raceForRemoveLap.riders.map(rider => {
               if (rider.id === data.riderId && rider.laps > 0) {
+                // Remove the last lap time from the array
+                const newLapTimes = [...(rider.lapTimes || [])];
+                const removedLapTime = newLapTimes.pop();
+                
+                // Calculate new total time by summing remaining lap times
+                const newTotalTime = newLapTimes.reduce((sum, time) => sum + (time || 0), 0);
+                
+                // Update previousLapTime to the last remaining lap time
+                const newPreviousLapTime = newLapTimes.length > 0 ? newLapTimes[newLapTimes.length - 1] : null;
+                
+                // Calculate the new lastLapTime based on remaining laps
+                let newLastLapTime = null;
+                if (newLapTimes.length > 0 && raceForRemoveLap.startTime) {
+                  // If there are remaining laps, calculate when the last lap was completed
+                  // by working backwards from the race start time
+                  let cumulativeTime = raceForRemoveLap.startTime;
+                  newLapTimes.forEach(lapTime => {
+                    cumulativeTime += lapTime;
+                  });
+                  newLastLapTime = cumulativeTime;
+                } else if (raceForRemoveLap.startTime) {
+                  // If no laps remaining, set lastLapTime to race start time
+                  newLastLapTime = raceForRemoveLap.startTime;
+                }
+                
                 return {
                   ...rider,
                   laps: rider.laps - 1,
-                  // Note: We don't recalculate previousLapTime here as it would be complex
-                  // The previous lap time will remain as the last completed lap
+                  lapTimes: newLapTimes,
+                  totalTime: newTotalTime,
+                  previousLapTime: newPreviousLapTime,
+                  lastLapTime: newLastLapTime
                 };
               }
               return rider;
@@ -357,10 +555,14 @@ wss.on('connection', (ws) => {
           }
           break;
 
-        case 'stopRace':
-          const raceToStop = getCurrentRace();
-          if (raceToStop) {
-            raceToStop.isRunning = false;
+        case 'finishRace':
+          const raceToFinish = getCurrentRace();
+          if (raceToFinish) {
+            raceToFinish.isRunning = false;
+            
+            // Generate and append final results to HTML file
+            appendFinalResults(raceToFinish);
+            
             saveData();
             broadcast({
               type: 'state',
@@ -375,9 +577,11 @@ wss.on('connection', (ws) => {
             raceToReset.riders = raceToReset.riders.map(rider => ({
               ...rider,
               laps: 0,
+              lapTimes: [],
+              totalTime: 0,
               lastLapTime: null,
               previousLapTime: null,
-              position: rider.id.charCodeAt(0) % raceToReset.riders.length + 1
+              position: rider.id.charCodeAt(0) % (raceToReset.riders.length || 1) + 1
             }));
             raceToReset.isRunning = false;
             raceToReset.startTime = null;
@@ -399,6 +603,35 @@ wss.on('connection', (ws) => {
               type: 'state',
               data: raceState
             });
+          }
+          break;
+
+        case 'addClass':
+          const raceForAddClass = getCurrentRace();
+          if (raceForAddClass) {
+            const name = (data.name || '').trim();
+            if (name) {
+              raceForAddClass.classes = raceForAddClass.classes || [];
+              if (!raceForAddClass.classes.includes(name)) {
+                raceForAddClass.classes.push(name);
+                saveData();
+                broadcast({ type: 'state', data: raceState });
+              }
+            }
+          }
+          break;
+
+        case 'removeClass':
+          const raceForRemoveClass = getCurrentRace();
+          if (raceForRemoveClass && Array.isArray(raceForRemoveClass.classes)) {
+            const name = (data.name || '').trim();
+            raceForRemoveClass.classes = raceForRemoveClass.classes.filter(c => c !== name);
+            // Also clear class from riders that had this class
+            raceForRemoveClass.riders = raceForRemoveClass.riders.map(r => (
+              r.class === name ? { ...r, class: '' } : r
+            ));
+            saveData();
+            broadcast({ type: 'state', data: raceState });
           }
           break;
 
@@ -449,6 +682,44 @@ app.get('/api/data-file', (req, res) => {
   }
 });
 
+// Final results endpoint
+app.get('/final_results', (req, res) => {
+  try {
+    if (fs.existsSync('final_results.html')) {
+      res.sendFile(path.join(__dirname, 'final_results.html'));
+    } else {
+      res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Wyniki Końcowe - MxCounter</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+            .container { max-width: 1200px; margin: 0 auto; }
+            h1 { color: #333; text-align: center; }
+            .no-results { text-align: center; color: #666; font-style: italic; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Wyniki Końcowe</h1>
+            <div class="no-results">Brak wyników wyścigów.</div>
+          </div>
+        </body>
+        </html>
+      `);
+    }
+  } catch (error) {
+    console.error('Error serving final results:', error);
+    res.status(500).send('Błąd ładowania wyników końcowych');
+  }
+});
+
+// Viewer results endpoint - serves SPA and App renders viewer mode on this path
+app.get('/results', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
+
 // Operator endpoint - redirects to main app with operator mode
 app.get('/operator', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
@@ -470,7 +741,7 @@ server.listen(PORT, HOST, () => {
   console.log(`WebSocket server ready for connections`);
   console.log(`Web app available at http://localhost:${PORT}`);
   console.log(`Operator mode: http://localhost:${PORT}/operator`);
-  console.log(`Network access: http://${getLocalIP()}:${PORT}`);
+  console.log(`Network access: http://<host_ip>:${PORT}`);
 });
 
 // Graceful shutdown

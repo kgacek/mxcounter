@@ -23,17 +23,25 @@ const App: React.FC = () => {
   const [newRiderName, setNewRiderName] = useState('');
   const [newRiderClass, setNewRiderClass] = useState<'Junior' | 'Cross' | 'Quad'>('Cross');
   const [newRaceName, setNewRaceName] = useState('');
+  const [bulkLapInput, setBulkLapInput] = useState('');
+  const [newClassName, setNewClassName] = useState('');
+  // Lock theme to night
+  const theme: 'day' | 'night' = 'night';
 
   useEffect(() => {
     try {
-      // Check if we're in operator mode based on URL
-      const isOperatorMode = window.location.pathname === '/operator';
-      setIsViewerMode(!isOperatorMode);
-      
-      // Subscribe to database changes
+      const path = window.location.pathname;
+      const isViewerPath = path === '/results';
+      const isOperatorMode = path === '/operator';
+      setIsViewerMode(isViewerPath || !isOperatorMode);
+
+      // Force night theme on body
+      const root = document.body;
+      root.classList.remove('theme-day', 'theme-night');
+      root.classList.add('theme-night');
+
       const unsubscribe = raceDatabase.subscribe((newState) => {
         try {
-          // Ensure the new state has the correct structure
           if (!newState.races) {
             console.warn('Received invalid state structure:', newState);
             setRaceState({ races: [], currentRaceId: null });
@@ -44,15 +52,13 @@ const App: React.FC = () => {
           console.error('Error updating state:', error);
         }
       });
-      
-      // Check connection status periodically
+
       const checkConnection = () => {
-        // This is a simple check - in a real app you'd want to track the actual WebSocket state
-        setIsConnected(true); // For now, assume connected if we're getting updates
+        setIsConnected(true);
       };
-      
+
       const connectionInterval = setInterval(checkConnection, 2000);
-      
+
       return () => {
         unsubscribe();
         clearInterval(connectionInterval);
@@ -124,18 +130,49 @@ const App: React.FC = () => {
     raceDatabase.addLap(riderId);
   };
 
+  const processBulkLap = () => {
+    const currentRace = getCurrentRace();
+    if (!currentRace || !currentRace.isRunning) {
+      setBulkLapInput('');
+      return;
+    }
+    const tokens = bulkLapInput.trim().split(/\s+/).filter(Boolean);
+    if (tokens.length === 0) return;
+
+    const numbersSet = new Set(tokens);
+    getSafeRiders(currentRace)
+      .filter(r => numbersSet.has(r.number))
+      .forEach(r => addLap(r.id));
+
+    setBulkLapInput('');
+  };
+
+  const handleBulkLapSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter') return;
+    processBulkLap();
+  };
+
   const startRace = () => {
     raceDatabase.startRace();
   };
 
-  const stopRace = () => {
-    raceDatabase.stopRace();
+  const finishRace = () => {
+    raceDatabase.finishRace();
   };
 
   const resetRace = () => {
     raceDatabase.resetRace();
   };
 
+  const addClass = () => {
+    if (!newClassName.trim()) return;
+    raceDatabase.addClass(newClassName.trim());
+    setNewClassName('');
+  };
+
+  const removeClass = (name: string) => {
+    raceDatabase.removeClass(name);
+  };
 
 
   const formatTime = (timestamp: number | null): string => {
@@ -158,6 +195,21 @@ const App: React.FC = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const formatTotalTime = (totalTime: number | null | undefined): string => {
+    if (!totalTime || totalTime === 0) return '--:--';
+    
+    // Convert milliseconds to minutes and seconds
+    const minutes = Math.floor(totalTime / 60000);
+    const seconds = Math.floor((totalTime % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const formatLapTimes = (lapTimes: number[] | null | undefined): string => {
+    if (!lapTimes || lapTimes.length === 0) return 'No laps';
+    
+    return lapTimes.map(time => formatLapTime(time)).join(', ');
+  };
+
   const getPositionColor = (position: number): string => {
     switch (position) {
       case 1: return '#FFD700'; // Gold
@@ -171,7 +223,7 @@ const App: React.FC = () => {
   const ConnectionStatus = () => (
     <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
       <span className="status-dot"></span>
-      {isConnected ? 'Connected' : 'Disconnected'}
+      {isConnected ? 'Połączony' : 'Rozłączony'}
     </div>
   );
 
@@ -183,7 +235,7 @@ const App: React.FC = () => {
       <div className="app">
         <header className="header">
           <h1>MxCounter</h1>
-          <p>Motocross Lap Counter - Operator Mode</p>
+          <p>Motopiknik - Tryb Operatora</p>
           <div className="header-controls">
             <ConnectionStatus />
             <div className="race-selection-header">
@@ -192,7 +244,7 @@ const App: React.FC = () => {
                 onChange={(e) => selectRace(e.target.value)}
                 className="race-select-header"
               >
-                <option value="">Select a race...</option>
+                <option value="">Wybierz wyścig...</option>
                 {(raceState.races || []).map((race) => (
                   <option key={race.id} value={race.id}>
                     {race.name}
@@ -210,43 +262,72 @@ const App: React.FC = () => {
                   Start
                 </button>
                 <button 
-                  onClick={stopRace} 
+                  onClick={finishRace} 
                   disabled={!currentRace.isRunning}
                   className="btn btn-danger"
                 >
-                  Stop
+                  Zakończ
                 </button>
 
-                <button 
-                  onClick={sortRiders} 
-                  className="btn btn-secondary"
-                >
-                  Sort
-                </button>
               </div>
             )}
             <button 
               onClick={() => setShowRaceSetup(true)} 
               className="btn btn-secondary"
             >
-              Race Setup
+              Konfiguracja Wyścigu
             </button>
             <button 
               onClick={() => setIsViewerMode(true)} 
               className="btn btn-secondary"
             >
-              Switch to Viewer Mode
+              Przełącz na Tryb Widza
             </button>
+            <a 
+              href="/final_results" 
+              target="_blank" 
+              className="btn btn-secondary"
+              style={{ textDecoration: 'none', color: 'white' }}
+            >
+              Wyniki Końcowe
+            </a>
           </div>
         </header>
 
         <div className="main-content operator-content">
           {currentRace ? (
             <div className="riders-section">
-              <h2>Riders ({getSafeRiders(currentRace).length})</h2>
+              <div className="riders-header">
+                <h2>Kierowcy ({getSafeRiders(currentRace).length})</h2>
+                <button 
+                  onClick={sortRiders} 
+                  className="btn btn-secondary"
+                >
+                  Sortuj
+                </button>
+              </div>
+              <div className="bulk-lap-entry" style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem', width: '100%' }}>
+                <input
+                  type="text"
+                  value={bulkLapInput}
+                  onChange={(e) => setBulkLapInput(e.target.value)}
+                  onKeyDown={handleBulkLapSubmit}
+                  className="input"
+                  placeholder="Numery kierowców (oddzielone spacją), Enter = +1 okrążenie"
+                  disabled={!currentRace.isRunning}
+                  style={{ flex: 1 }}
+                />
+                <button
+                  onClick={processBulkLap}
+                  disabled={!currentRace.isRunning}
+                  className="btn btn-primary"
+                >
+                  Wprowadź
+                </button>
+              </div>
               
               {getSafeRiders(currentRace).length === 0 ? (
-                <p className="no-riders">No riders added yet. Go to Race Setup to add riders.</p>
+                <p className="no-riders">Brak kierowców. Przejdź do Konfiguracji Wyścigu aby dodać kierowców.</p>
               ) : (
                 <div className="riders-by-class">
                   {(() => {
@@ -262,7 +343,7 @@ const App: React.FC = () => {
                       const classRiders = ridersByClass[className];
                       return (
                         <div key={className} className="class-group">
-                          <h3 className="class-group-title">{className} Class ({classRiders.length})</h3>
+                          <h3 className="class-group-title">Klasa {className} ({classRiders.length})</h3>
                           <div className="riders-grid">
                             {classRiders.map((rider) => (
                               <div 
@@ -274,18 +355,17 @@ const App: React.FC = () => {
                                   <span className="rider-number">#{rider.number}</span>
                                   <span className="rider-position">P{rider.position}</span>
                                 </div>
-                                <div className="rider-name">{rider.name}</div>
-                                <div className="rider-laps">Laps: {rider.laps}</div>
-                                <div className="rider-actions">
+                                <div className="rider-laps-row">
+                                  <span className="rider-laps-big">{rider.laps}</span>
                                   <button 
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       removeLap(rider.id);
                                     }}
                                     disabled={!currentRace.isRunning || rider.laps === 0}
-                                    className="btn btn-remove-lap"
+                                    className="btn btn-remove-lap btn-inline-minus"
                                   >
-                                    -1 Lap
+                                    -1
                                   </button>
                                 </div>
                               </div>
@@ -300,8 +380,8 @@ const App: React.FC = () => {
             </div>
           ) : (
             <div className="no-race-selected">
-              <h2>No Race Selected</h2>
-              <p>Please select a race from the dropdown above or create a new race in Race Setup.</p>
+              <h2>Brak wybranego wyścigu</h2>
+              <p>Wybierz wyścig z listy powyżej lub utwórz nowy wyścig w Konfiguracji Wyścigu.</p>
             </div>
           )}
         </div>
@@ -331,7 +411,7 @@ const App: React.FC = () => {
           <div className="race-status">
             <ConnectionStatus />
             <span className={`status-indicator ${currentRace?.isRunning ? 'running' : 'stopped'}`}>
-              {currentRace?.isRunning ? 'RACE IN PROGRESS' : 'RACE STOPPED'}
+              {currentRace?.isRunning ? 'WYŚCIG W TOKU' : 'WYŚCIG ZATRZYMANY'}
             </span>
           </div>
         </header>
@@ -339,7 +419,7 @@ const App: React.FC = () => {
         <div className="results-container">
           {!currentRace || getSafeRiders(currentRace).length === 0 ? (
             <div className="no-data">
-              Waiting for race data...
+              Oczekiwanie na dane wyścigu...
             </div>
           ) : (
             <div className="class-results">
@@ -347,15 +427,16 @@ const App: React.FC = () => {
                 const classRiders = ridersByClass[className].sort((a, b) => a.position - b.position);
                 return (
                   <div key={className} className="class-section">
-                    <h2 className="class-title">{className} Class</h2>
+                    <h2 className="class-title">Klasa {className}</h2>
                     <table className="results-table">
                       <thead>
                         <tr>
-                          <th>POS</th>
-                          <th>NUMBER</th>
-                          <th>NAME</th>
-                          <th>LAPS</th>
-                          <th>PREVIOUS LAP</th>
+                          <th>POZ</th>
+                          <th>NUMER</th>
+                          <th>IMIĘ</th>
+                          <th>OKRĄŻENIA</th>
+                          <th>ŁĄCZNY CZAS</th>
+                          <th>POPRZEDNIE OKRĄŻENIE</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -367,6 +448,7 @@ const App: React.FC = () => {
                             <td className="number">#{rider.number}</td>
                             <td className="name">{rider.name}</td>
                             <td className="laps">{rider.laps}</td>
+                            <td className="total-time">{formatTotalTime(rider.totalTime)}</td>
                             <td className="last-lap">{formatLapTime(rider.previousLapTime)}</td>
                           </tr>
                         ))}
@@ -381,9 +463,9 @@ const App: React.FC = () => {
 
         <footer className="viewer-footer">
           <div className="race-info">
-            <span>Total Riders: {getSafeRiders(currentRace).length}</span>
-            <span>Race Start: {currentRace?.startTime ? formatTime(currentRace.startTime) : '--:--'}</span>
-            <span>Current Lap: {currentRace?.currentLap || 0}</span>
+            <span>Łącznie kierowców: {getSafeRiders(currentRace).length}</span>
+            <span>Start wyścigu: {currentRace?.startTime ? formatTime(currentRace.startTime) : '--:--'}</span>
+            <span>Aktualne okrążenie: {currentRace?.currentLap || 0}</span>
           </div>
         </footer>
       </div>
@@ -397,59 +479,87 @@ const App: React.FC = () => {
     return (
       <div className="app">
         <header className="header">
-          <h1>MxCounter - Race Setup</h1>
+          <h1>MxCounter - Konfiguracja Wyścigu</h1>
           <div className="header-controls">
             <ConnectionStatus />
             <button 
               onClick={() => setShowRaceSetup(false)} 
               className="btn btn-secondary"
             >
-              Back to Operator Mode
+              Powrót do Trybu Operatora
             </button>
           </div>
         </header>
 
         <div className="main-content race-setup-content">
           <div className="setup-section">
-            <h2>Create New Race</h2>
+            <h2>Utwórz Nowy Wyścig</h2>
             <div className="add-race-form">
               <input
                 type="text"
-                placeholder="Race Name"
+                placeholder="Nazwa wyścigu"
                 value={newRaceName}
                 onChange={(e) => setNewRaceName(e.target.value)}
                 className="input"
               />
-              <button onClick={createRace} className="btn btn-primary">Create Race</button>
+              <button onClick={createRace} className="btn btn-primary">Utwórz Wyścig</button>
+            </div>
+          </div>
+
+          <div className="setup-section">
+            <h2>Klasy wyścigu</h2>
+            <div className="add-race-form">
+              <input
+                type="text"
+                placeholder="Nazwa klasy (np. Junior, Cross, Quad)"
+                value={newClassName}
+                onChange={(e) => setNewClassName(e.target.value)}
+                className="input"
+              />
+              <button onClick={addClass} className="btn btn-primary">Dodaj klasę</button>
+            </div>
+            <div className="races-list">
+              {(currentRace?.classes || []).length === 0 ? (
+                <div className="no-data">Brak zdefiniowanych klas.</div>
+              ) : (
+                (currentRace?.classes || []).map((cls) => (
+                  <div key={cls} className="race-item">
+                    <span className="race-name">{cls}</span>
+                    <div className="race-actions">
+                      <button onClick={() => removeClass(cls)} className="btn btn-danger">Usuń</button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
           <div className="races-section">
-            <h2>Available Races</h2>
+            <h2>Dostępne Wyścigi</h2>
             <div className="races-list">
               {(raceState.races || []).map((race) => (
                 <div key={race.id} className="race-item">
                   <span className="race-name">{race.name}</span>
-                  <span className="race-riders">({race.riders?.length || 0} riders)</span>
+                  <span className="race-riders">({race.riders?.length || 0} kierowców)</span>
                   <div className="race-actions">
                     <button 
                       onClick={() => selectRace(race.id)}
                       className={`btn ${raceState.currentRaceId === race.id ? 'btn-primary' : 'btn-secondary'}`}
                     >
-                      {raceState.currentRaceId === race.id ? 'Selected' : 'Select'}
+                      {raceState.currentRaceId === race.id ? 'Wybrany' : 'Wybierz'}
                     </button>
                     <button 
                       onClick={() => resetRace()}
                       className="btn btn-warning"
                       disabled={!race.isRunning && getSafeRiders(race).length === 0}
                     >
-                      Reset
+                      Resetuj
                     </button>
                     <button 
                       onClick={() => removeRace(race.id)}
                       className="btn btn-danger"
                     >
-                      Remove
+                      Usuń
                     </button>
                   </div>
                 </div>
@@ -459,50 +569,51 @@ const App: React.FC = () => {
 
           {currentRace && (
             <div className="riders-setup-section">
-              <h2>Add Riders to {currentRace.name}</h2>
+              <h2>Dodaj Kierowców do {currentRace.name}</h2>
               
               <div className="add-rider-form">
                 <input
                   type="text"
-                  placeholder="Rider Number"
+                  placeholder="Numer kierowcy"
                   value={newRiderNumber}
                   onChange={(e) => setNewRiderNumber(e.target.value)}
                   className="input"
                 />
                 <input
                   type="text"
-                  placeholder="Rider Name"
+                  placeholder="Imię kierowcy"
                   value={newRiderName}
                   onChange={(e) => setNewRiderName(e.target.value)}
                   className="input"
                 />
                 <select
                   value={newRiderClass}
-                  onChange={(e) => setNewRiderClass(e.target.value as 'Junior' | 'Cross' | 'Quad')}
+                  onChange={(e) => setNewRiderClass(e.target.value as any)}
                   className="input"
                 >
-                  <option value="Junior">Junior</option>
-                  <option value="Cross">Cross</option>
-                  <option value="Quad">Quad</option>
+                  <option value="">(bez klasy)</option>
+                  {(currentRace?.classes || []).map((cls) => (
+                    <option key={cls} value={cls}>{cls}</option>
+                  ))}
                 </select>
-                <button onClick={addRider} className="btn btn-primary">Add Rider</button>
+                <button onClick={addRider} className="btn btn-primary">Dodaj Kierowcę</button>
               </div>
 
               <div className="riders-table">
                 <table className="results-table">
                   <thead>
                     <tr>
-                      <th>NUMBER</th>
-                      <th>NAME</th>
-                      <th>CLASS</th>
-                      <th>ACTIONS</th>
+                      <th>NUMER</th>
+                      <th>IMIĘ</th>
+                      <th>KLASA</th>
+                      <th>AKCJE</th>
                     </tr>
                   </thead>
                   <tbody>
                     {getSafeRiders(currentRace).length === 0 ? (
                       <tr>
                         <td colSpan={4} className="no-data">
-                          No riders added yet.
+                          Brak dodanych kierowców.
                         </td>
                       </tr>
                     ) : (
@@ -516,7 +627,7 @@ const App: React.FC = () => {
                               onClick={() => removeRider(rider.id)}
                               className="btn btn-remove"
                             >
-                              Remove
+                              Usuń
                             </button>
                           </td>
                         </tr>
@@ -548,12 +659,12 @@ const App: React.FC = () => {
       <div className="app">
         <header className="header">
           <h1>MxCounter</h1>
-          <p>Error loading application</p>
+          <p>Błąd ładowania aplikacji</p>
         </header>
         <div className="main-content">
           <div className="setup-section">
-            <h2>Error</h2>
-            <p>There was an error loading the application. Please refresh the page.</p>
+            <h2>Błąd</h2>
+            <p>Wystąpił błąd podczas ładowania aplikacji. Odśwież stronę.</p>
             <pre>{error instanceof Error ? error.message : String(error)}</pre>
           </div>
         </div>

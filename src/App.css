@@ -1,8 +1,70 @@
-.app {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+/* Global scroll behavior */
+html, body {
+  min-height: 100%;
+  height: auto;
+  overflow-y: auto;
+}
+
+#root, .app {
+  min-height: 100%;
+  height: auto;
+  overflow-y: auto;
+}
+
+/* Fix: prevent horizontal cutoff; constrain to viewport width */
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+#root, .app, .viewer-app {
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* Ensure main containers don't exceed viewport and keep internal padding */
+.main-content,
+.results-container,
+.riders-section,
+.riders-setup-section,
+.races-section,
+.setup-section {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Tables should scroll instead of expanding page width */
+.riders-table .results-table,
+.results-table {
+  overflow-x: auto;
+  display: block;
+}
+
+/* Ensure main containers can scroll */
+.main-content,
+.operator-content,
+.viewer-app,
+.race-setup-content,
+.riders-section,
+.results-container {
+  overflow-y: auto;
+  max-height: none;
+}
+
+/* Remove overflow hidden that can clip content and block page growth */
+.riders-table .results-table {
+  /* was overflow: hidden; */
+  overflow: visible;
+}
+
+.class-section,
+.results-table {
+  /* was overflow: hidden; */
+  overflow: visible;
 }
 
 .header {
@@ -100,26 +162,6 @@
   0% { opacity: 1; }
   50% { opacity: 0.5; }
   100% { opacity: 1; }
-}
-
-.main-content {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 2rem;
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 2rem;
-}
-
-/* Single column layout for race setup */
-.race-setup-content {
-  grid-template-columns: 1fr !important;
-}
-
-/* Full width layout for operator mode */
-.operator-content {
-  grid-template-columns: 1fr !important;
-  max-width: 100%;
 }
 
 .setup-section {
@@ -228,14 +270,6 @@
   transform: translateY(-2px);
 }
 
-.riders-section {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2rem;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  min-height: 70vh;
-}
-
 .riders-by-class {
   display: flex;
   flex-direction: column;
@@ -281,8 +315,15 @@
   opacity: 0.8;
 }
 
-.riders-section h2 {
+.riders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1.5rem;
+}
+
+.riders-header h2 {
+  margin: 0;
   font-size: 1.5rem;
 }
 
@@ -292,9 +333,10 @@
   font-style: italic;
 }
 
+/* Rider cards ~2/3 of previous width */
 .riders-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 1.5rem;
   width: 100%;
 }
@@ -356,10 +398,19 @@
 
 .rider-laps {
   font-size: 0.9rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   color: #FFD700;
   font-weight: bold;
   opacity: 0.8;
+}
+
+.rider-total-time {
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+  color: #2196F3;
+  font-weight: bold;
+  opacity: 0.9;
+  font-family: 'Courier New', monospace;
 }
 
 .rider-actions {
@@ -490,7 +541,7 @@
   width: 100%;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .riders-table .results-table th,
@@ -518,15 +569,6 @@
 }
 
 /* Viewer Mode Styles */
-.viewer-app {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  display: flex;
-  flex-direction: column;
-}
-
 .viewer-header {
   background: rgba(0, 0, 0, 0.8);
   padding: 1rem 2rem;
@@ -607,7 +649,7 @@
   border-collapse: collapse;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
@@ -668,6 +710,14 @@
   color: #4CAF50;
 }
 
+.total-time {
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 1rem;
+  color: #FFD700;
+}
+
 .last-lap {
   text-align: center;
   font-family: 'Courier New', monospace;
@@ -724,6 +774,61 @@
   font-size: 0.9rem;
   opacity: 0.8;
 }
+
+/* Contrast improvements for readability */
+.viewer-app .results-table th {
+  color: #FFD700; /* gold headers for dark bg */
+}
+
+.viewer-app .results-table td {
+  color: #FFFFFF; /* white rows for contrast */
+}
+
+.results-table .number,
+.results-table .name {
+  color: #FFFFFF;
+}
+
+.total-time {
+  color: #FFD700; /* keep total time gold */
+}
+
+.last-lap {
+  color: #2196F3; /* readable blue on dark bg */
+}
+
+/* Text color adjustments: make text black on light backgrounds */
+.setup-section,
+.race-selection,
+.races-section,
+.riders-setup-section,
+.riders-section,
+.races-list .race-item,
+.riders-table .results-table,
+.riders-table .results-table th,
+.riders-table .results-table td,
+.rider-card {
+  color: #000000;
+}
+
+/* Ensure specific inner texts are black in light cards/blocks */
+.races-list .race-item .race-name,
+.races-list .race-item .race-riders,
+.no-data,
+.rider-card .rider-name,
+.rider-card .rider-laps,
+.rider-card .rider-position,
+.bulk-lap-entry .input,
+.add-rider-form .input,
+.add-race-form .input {
+  color: #000000;
+}
+
+/* Keep highlight colors as designed */
+.rider-number { color: #FFD700; }
+.rider-laps { color: #FFD700; }
+.total-time { color: #2196F3; }
+.last-lap { color: #2196F3; }
 
 /* Responsive design */
 @media (max-width: 768px) {
@@ -791,4 +896,146 @@
   .name {
     font-size: 1rem;
   }
+}
+
+/* Remove/day overrides: ensure night-only styles */
+html, body, #root, .app, .viewer-app {
+  background: #0F1115 !important;
+  color: #FFFFFF !important;
+}
+
+/* Force white text across common containers */
+.setup-section,
+.race-selection,
+.races-section,
+.riders-setup-section,
+.riders-section,
+.races-list .race-item,
+.riders-table .results-table,
+.riders-table .results-table th,
+.riders-table .results-table td,
+.rider-card,
+.results-table th,
+.results-table td,
+.no-data,
+.header p,
+.header h1 {
+  color: #FFFFFF !important;
+}
+
+/* Inputs dark with white text */
+.input { background: #1B2030 !important; color: #FFFFFF !important; border: 1px solid #3A3F4B !important; }
+.input::placeholder { color: #9AA0A6 !important; }
+
+/* Buttons night colors retained */
+.btn-secondary { background: #2B2F3A !important; color: #FFFFFF !important; border: 1px solid #3A3F4B !important; }
+
+/* Table backgrounds for night */
+.results-table, .rider-card, .races-list .race-item, .setup-section, .riders-section, .races-section, .class-section {
+  background: #141822 !important;
+  border: 1px solid #2B2F3A !important;
+}
+
+/* Keep accent colors readable */
+.total-time, .last-lap { color: #64B5F6 !important; }
+.laps { color: #81C784 !important; }
+.number, .rider-number { color: #FFD54F !important; }
+
+/* Night theme: force white text in operator and race setup */
+.theme-night .rider-name,
+.theme-night .rider-laps,
+.theme-night .riders-table .results-table th,
+.theme-night .riders-table .results-table td,
+.theme-night .riders-setup-section .results-table th,
+.theme-night .riders-setup-section .results-table td,
+.theme-night .setup-section .race-name,
+.theme-night .setup-section .race-riders,
+.theme-night .no-data {
+  color: #FFFFFF !important;
+}
+
+/* Night theme: force white text for race selection entries */
+.theme-night .races-section .races-list .race-item { color: #FFFFFF !important; }
+.theme-night .races-section .race-item .race-name { color: #FFFFFF !important; }
+.theme-night .races-section .race-item .race-riders { color: #FFFFFF !important; }
+
+/* Night theme: dropdowns/selects in headers and setup */
+.theme-night .race-select-header,
+.theme-night .race-select,
+.theme-night select.input {
+  background: #1B2030 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #3A3F4B !important;
+}
+
+.theme-night .race-select-header option,
+.theme-night .race-select option,
+.theme-night select.input option {
+  background: #1B2030 !important;
+  color: #FFFFFF !important;
+}
+
+/* Make viewer grid wrap earlier to avoid overflow */
+.class-results {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+@media (max-width: 600px) {
+  .class-results { grid-template-columns: 1fr; }
+}
+
+/* Ensure rider card can anchor absolutely positioned children */
+.rider-card {
+  position: relative;
+}
+
+.rider-laps-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.rider-laps-big {
+  font-size: 2.4rem;
+  line-height: 1;
+  font-weight: 800;
+  color: #81C784; /* green */
+}
+
+.btn-inline-minus {
+  position: absolute !important;
+  right: 8px !important;
+  bottom: 8px !important;
+  background: #B71C1C !important;
+  color: #FFFFFF !important;
+  padding: 0.2rem 0.48rem !important; /* was 0.25rem 0.6rem */
+  font-size: 0.88rem !important;      /* was 1.1rem */
+  border-radius: 6px !important;
+  z-index: 1;
+}
+
+/* Keep rider number prominent as before */
+.rider-number {
+  font-size: 3rem;
+}
+
+/* Fluid tables in viewer results and race setup */
+.riders-table,
+.results-container,
+.class-section {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto; /* container scrolls if needed */
+}
+
+/* Ensure tables fill available space and scale with window */
+.riders-table .results-table,
+.class-section .results-table,
+.results-table {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: auto;
+  border-collapse: collapse;
+  display: table; /* revert from block to table for fluid width */
 }

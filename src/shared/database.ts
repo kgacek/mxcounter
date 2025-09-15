@@ -2,11 +2,13 @@ export interface Rider {
   id: string;
   number: string;
   name: string;
-  class: 'Junior' | 'Cross' | 'Quad';
+  class: string; // class name defined per race
   laps: number;
   position: number;
-  lastLapTime: number | null; // Time when the lap was completed
-  previousLapTime: number | null; // Time of the previous lap (for display)
+  lapTimes: number[]; // Array of individual lap durations in milliseconds
+  totalTime: number; // Total time in milliseconds (sum of all lap times)
+  lastLapTime: number | null; // Time when the lap was completed (timestamp)
+  previousLapTime: number | null; // Duration of the previous lap (for display)
   isActive: boolean;
 }
 
@@ -14,6 +16,7 @@ export interface Race {
   id: string;
   name: string;
   riders: Rider[];
+  classes?: string[]; // configurable classes per race
   isRunning: boolean;
   startTime: number | null;
   currentLap: number;
@@ -161,8 +164,17 @@ class RaceDatabase {
     });
   }
 
+  // Manage classes
+  addClass(name: string): void {
+    this.sendMessage({ type: 'addClass', name });
+  }
+
+  removeClass(name: string): void {
+    this.sendMessage({ type: 'removeClass', name });
+  }
+
   // Add rider
-  addRider(number: string, name: string, riderClass: 'Junior' | 'Cross' | 'Quad' = 'Cross'): void {
+  addRider(number: string, name: string, riderClass: string = ''): void {
     this.sendMessage({
       type: 'addRider',
       number,
@@ -202,10 +214,10 @@ class RaceDatabase {
     });
   }
 
-  // Stop race
-  stopRace(): void {
+  // Finish race
+  finishRace(): void {
     this.sendMessage({
-      type: 'stopRace'
+      type: 'finishRace'
     });
   }
 
@@ -215,8 +227,6 @@ class RaceDatabase {
       type: 'resetRace'
     });
   }
-
-
 
   // Subscribe to state changes
   subscribe(listener: (state: RaceState) => void): () => void {
