@@ -14,7 +14,8 @@ app.use(cors());
 app.use(express.json());
 
 // Data persistence functions
-const DATA_FILE = 'race_data.json';
+const DATA_FILE = path.join(__dirname, 'race_data.json');
+const RESULTS_FILE = path.join(__dirname, 'final_results.html');
 
 function saveData() {
   try {
@@ -261,8 +262,8 @@ function appendFinalResults(race) {
     let existingContent = '';
     let isNewFile = false;
     
-    if (fs.existsSync('final_results.html')) {
-      existingContent = fs.readFileSync('final_results.html', 'utf8');
+    if (fs.existsSync(RESULTS_FILE)) {
+      existingContent = fs.readFileSync(RESULTS_FILE, 'utf8');
     } else {
       isNewFile = true;
     }
@@ -324,7 +325,7 @@ function appendFinalResults(race) {
       }
     }
     
-    fs.writeFileSync('final_results.html', newContent);
+    fs.writeFileSync(RESULTS_FILE, newContent);
     console.log(`Final results appended for race: ${race.name}`);
   } catch (error) {
     console.error('Error appending final results:', error);
@@ -685,8 +686,8 @@ app.get('/api/data-file', (req, res) => {
 // Final results endpoint
 app.get('/final_results', (req, res) => {
   try {
-    if (fs.existsSync('final_results.html')) {
-      res.sendFile(path.join(__dirname, 'final_results.html'));
+    if (fs.existsSync(RESULTS_FILE)) {
+      res.sendFile(RESULTS_FILE);
     } else {
       res.send(`
         <!DOCTYPE html>
