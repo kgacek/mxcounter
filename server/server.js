@@ -4,6 +4,7 @@ const WebSocket = require('ws');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const { exec } = require('child_process');
 
 const app = express();
 const server = http.createServer(app);
@@ -16,6 +17,8 @@ app.use(express.json());
 // Data persistence functions
 const DATA_FILE = path.join(__dirname, 'race_data.json');
 const RESULTS_FILE = path.join(__dirname, 'final_results.html');
+const DOCS_DIR = path.join(__dirname, '..', 'docs');
+const DOCS_INDEX = path.join(DOCS_DIR, 'index.html');
 
 function saveData() {
   try {
@@ -326,6 +329,28 @@ function appendFinalResults(race) {
     }
     
     fs.writeFileSync(RESULTS_FILE, newContent);
+
+    // Also copy to docs/index.html for GitHub Pages
+    try {
+      if (!fs.existsSync(DOCS_DIR)) {
+        fs.mkdirSync(DOCS_DIR, { recursive: true });
+      }
+      fs.writeFileSync(DOCS_INDEX, newContent);
+
+      // Git commit and push (assumes SSH auth configured)
+      const repoRoot = path.join(__dirname, '..');
+      const commitMsg = `"Update final results: ${new Date().toISOString()}"`;
+      const cmd = `git add docs/index.html && git commit -m ${commitMsg} || echo "No changes" && git push`;
+      exec(cmd, { cwd: repoRoot }, (err, stdout, stderr) => {
+        if (err) {
+          console.error('Git update failed:', err.message);
+        }
+        if (stdout) console.log(stdout.trim());
+        if (stderr) console.error(stderr.trim());
+      });
+    } catch (e) {
+      console.error('Failed to update GitHub Pages docs:', e);
+    }
     console.log(`Final results appended for race: ${race.name}`);
   } catch (error) {
     console.error('Error appending final results:', error);
