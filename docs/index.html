@@ -2,18 +2,248 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Wyniki Końcowe - Motopiknik</title>
+  <title>Wyniki Końcowe - MxCounter</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
     .container { max-width: 1200px; margin: 0 auto; }
-    h1 { color: #333; text-align: center; }
+    h1 { color: #333; text-align: center; margin-bottom: 30px; }
+    .race-result { background: white; margin-bottom: 30px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .race-result h2 { color: #2196F3; margin-bottom: 20px; border-bottom: 2px solid #2196F3; padding-bottom: 10px; }
+    .race-result h3 { color: #FFD700; margin: 20px 0 10px 0; }
+    .results-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .results-table th, .results-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    .results-table th { background-color: #f8f9fa; font-weight: bold; color: #333; }
+    .results-table tr:hover { background-color: #f5f5f5; }
+    .position { font-weight: bold; color: #2196F3; }
+    .name { font-weight: 600; }
+    .lap-times { font-family: 'Courier New', monospace; font-size: 0.9em; }
+    .total-time { font-family: 'Courier New', monospace; font-weight: bold; color: #4CAF50; }
     .no-results { text-align: center; color: #666; font-style: italic; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Wyniki Końcowe</h1>
-    <div class="no-results">Brak wyników wyścigów.</div>
+
+    <div class="race-result">
+      <h2>wyscig cross - test 1 - start: 9/15/2025, 2:47:36 PM</h2>
+  
+      <h3>Klasa Cross</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Pozycja</th>
+            <th>Imię</th>
+            <th>Czasy Okrążeń</th>
+            <th>Łączny Czas</th>
+            <th>Średni Czas</th>
+          </tr>
+        </thead>
+        <tbody>
+    
+        <tr>
+          <td class="position">1</td>
+          <td class="name">Maciek#121</td>
+          <td class="lap-times">0:02, 0:25, 0:22, 26:35</td>
+          <td class="total-time">27:25</td>
+          <td class="avg-time">6:51</td>
+        </tr>
+      
+        <tr>
+          <td class="position">2</td>
+          <td class="name">Piotr#101</td>
+          <td class="lap-times">0:02, 0:28, 0:18, 26:35</td>
+          <td class="total-time">27:26</td>
+          <td class="avg-time">6:51</td>
+        </tr>
+      
+        <tr>
+          <td class="position">3</td>
+          <td class="name">Dominik#208</td>
+          <td class="lap-times">0:03, 0:24, 0:22, 26:35</td>
+          <td class="total-time">27:26</td>
+          <td class="avg-time">6:51</td>
+        </tr>
+      
+        <tr>
+          <td class="position">4</td>
+          <td class="name">Alan#302</td>
+          <td class="lap-times">0:04, 0:24, 0:22, 26:35</td>
+          <td class="total-time">27:27</td>
+          <td class="avg-time">6:51</td>
+        </tr>
+      
+        <tr>
+          <td class="position">5</td>
+          <td class="name">Dariusz#987</td>
+          <td class="lap-times">0:04, 0:24, 0:22, 26:35</td>
+          <td class="total-time">27:28</td>
+          <td class="avg-time">6:52</td>
+        </tr>
+      
+        <tr>
+          <td class="position">6</td>
+          <td class="name">Jerzy#12</td>
+          <td class="lap-times">0:05, 0:24, 0:23, 26:35</td>
+          <td class="total-time">27:28</td>
+          <td class="avg-time">6:52</td>
+        </tr>
+      
+        <tr>
+          <td class="position">7</td>
+          <td class="name">Seba#123</td>
+          <td class="lap-times">0:06, 0:27, 0:19, 26:36</td>
+          <td class="total-time">27:28</td>
+          <td class="avg-time">6:52</td>
+        </tr>
+      
+        <tr>
+          <td class="position">8</td>
+          <td class="name">Janusz#292</td>
+          <td class="lap-times">0:06, 0:27, 0:19, 26:35</td>
+          <td class="total-time">27:29</td>
+          <td class="avg-time">6:52</td>
+        </tr>
+      
+        <tr>
+          <td class="position">9</td>
+          <td class="name">Krysia#109</td>
+          <td class="lap-times">0:07, 0:28, 0:19, 26:35</td>
+          <td class="total-time">27:31</td>
+          <td class="avg-time">6:52</td>
+        </tr>
+      
+        <tr>
+          <td class="position">10</td>
+          <td class="name">Marek#212</td>
+          <td class="lap-times">0:07, 0:28, 0:19, 26:35</td>
+          <td class="total-time">27:31</td>
+          <td class="avg-time">6:52</td>
+        </tr>
+      
+        <tr>
+          <td class="position">11</td>
+          <td class="name">Krzysztof#211</td>
+          <td class="lap-times">0:08, 0:27, 0:20, 26:35</td>
+          <td class="total-time">27:31</td>
+          <td class="avg-time">6:52</td>
+        </tr>
+      
+        <tr>
+          <td class="position">12</td>
+          <td class="name">Piter#294</td>
+          <td class="lap-times">0:09, 0:27, 0:20, 26:35</td>
+          <td class="total-time">27:32</td>
+          <td class="avg-time">6:53</td>
+        </tr>
+      
+        <tr>
+          <td class="position">13</td>
+          <td class="name">Grzesiek#306</td>
+          <td class="lap-times">0:09, 0:27, 0:20, 26:34</td>
+          <td class="total-time">27:32</td>
+          <td class="avg-time">6:53</td>
+        </tr>
+      
+        <tr>
+          <td class="position">14</td>
+          <td class="name">Pawel#293</td>
+          <td class="lap-times">0:10, 0:27, 0:20, 26:34</td>
+          <td class="total-time">27:33</td>
+          <td class="avg-time">6:53</td>
+        </tr>
+      
+        <tr>
+          <td class="position">15</td>
+          <td class="name">Andrzej#234</td>
+          <td class="lap-times">0:11, 0:27, 0:20, 26:34</td>
+          <td class="total-time">27:33</td>
+          <td class="avg-time">6:53</td>
+        </tr>
+      
+        <tr>
+          <td class="position">16</td>
+          <td class="name">Andrzej J#293</td>
+          <td class="lap-times">0:11, 0:27, 0:20, 26:34</td>
+          <td class="total-time">27:33</td>
+          <td class="avg-time">6:53</td>
+        </tr>
+      
+        </tbody>
+      </table>
+    
+      <h3>Klasa Junior</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Pozycja</th>
+            <th>Imię</th>
+            <th>Czasy Okrążeń</th>
+            <th>Łączny Czas</th>
+            <th>Średni Czas</th>
+          </tr>
+        </thead>
+        <tbody>
+    
+        <tr>
+          <td class="position">1</td>
+          <td class="name">Karol#202</td>
+          <td class="lap-times">0:16, 0:25, 0:19</td>
+          <td class="total-time">1:01</td>
+          <td class="avg-time">0:20</td>
+        </tr>
+      
+        <tr>
+          <td class="position">2</td>
+          <td class="name">Michał#44</td>
+          <td class="lap-times">0:16, 0:25, 0:20</td>
+          <td class="total-time">1:01</td>
+          <td class="avg-time">0:20</td>
+        </tr>
+      
+        <tr>
+          <td class="position">3</td>
+          <td class="name">Jan#30</td>
+          <td class="lap-times">0:17, 0:25, 0:19</td>
+          <td class="total-time">1:02</td>
+          <td class="avg-time">0:20</td>
+        </tr>
+      
+        <tr>
+          <td class="position">4</td>
+          <td class="name">Benek#333</td>
+          <td class="lap-times">0:17, 0:24, 0:20</td>
+          <td class="total-time">1:02</td>
+          <td class="avg-time">0:20</td>
+        </tr>
+      
+        <tr>
+          <td class="position">5</td>
+          <td class="name">Adam#33</td>
+          <td class="lap-times">0:18, 0:25, 0:19</td>
+          <td class="total-time">1:03</td>
+          <td class="avg-time">0:21</td>
+        </tr>
+      
+        <tr>
+          <td class="position">6</td>
+          <td class="name">Seba#211</td>
+          <td class="lap-times">0:18, 0:25, 0:19</td>
+          <td class="total-time">1:04</td>
+          <td class="avg-time">0:21</td>
+        </tr>
+      
+        <tr>
+          <td class="position">7</td>
+          <td class="name">Mikołaj#110</td>
+          <td class="lap-times">0:19, 0:25, 0:19</td>
+          <td class="total-time">1:04</td>
+          <td class="avg-time">0:21</td>
+        </tr>
+      
+        </tbody>
+      </table>
+    </div>
   </div>
 </body>
 </html>
