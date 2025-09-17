@@ -10,6 +10,7 @@ export interface Rider {
   lastLapTime: number | null; // Time when the lap was completed (timestamp)
   previousLapTime: number | null; // Duration of the previous lap (for display)
   isActive: boolean;
+  penaltyMs: number; // Accumulated penalties in milliseconds
 }
 
 export interface Race {
@@ -203,6 +204,13 @@ class RaceDatabase {
   removeLap(riderId: string): void {
     this.sendMessage({
       type: 'removeLap',
+      riderId
+    });
+  }
+
+  addPenalty(riderId: string): void {
+    this.sendMessage({
+      type: 'addPenalty',
       riderId
     });
   }

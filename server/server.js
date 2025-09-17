@@ -115,8 +115,10 @@ function updatePositionsOnly(race) {
     const sortedClassRiders = classRiders.sort((a, b) => {
       // First sort by number of laps (descending)
       if (a.laps !== b.laps) return b.laps - a.laps;
-      // Then sort by total time (ascending - fastest time first)
-      if (a.totalTime !== b.totalTime) return a.totalTime - b.totalTime;
+      // Then by total time + penalties (ascending)
+      const at = (a.totalTime || 0) + (a.penaltyMs || 0);
+      const bt = (b.totalTime || 0) + (b.penaltyMs || 0);
+      if (at !== bt) return at - bt;
       return 0;
     });
 
@@ -150,10 +152,10 @@ function updatePositions(race) {
   Object.keys(ridersByClass).forEach(className => {
     const classRiders = ridersByClass[className];
     const sortedClassRiders = classRiders.sort((a, b) => {
-      // First sort by number of laps (descending)
       if (a.laps !== b.laps) return b.laps - a.laps;
-      // Then sort by total time (ascending - fastest time first)
-      if (a.totalTime !== b.totalTime) return a.totalTime - b.totalTime;
+      const at = (a.totalTime || 0) + (a.penaltyMs || 0);
+      const bt = (b.totalTime || 0) + (b.penaltyMs || 0);
+      if (at !== bt) return at - bt;
       return 0;
     });
 
@@ -214,6 +216,7 @@ function generateFinalResultsHTML(race) {
             <th>Czasy Okrążeń</th>
             <th>Łączny Czas</th>
             <th>Średni Czas</th>
+            <th>Kara</th>
           </tr>
         </thead>
         <tbody>
@@ -224,9 +227,11 @@ function generateFinalResultsHTML(race) {
       const lapTimesStr = rider.lapTimes && rider.lapTimes.length > 0 
         ? rider.lapTimes.map(time => formatLapTime(time)).join(', ')
         : 'Brak okrążeń';
-      const totalTimeStr = formatLapTime(rider.totalTime);
+      const totalWithPen = (rider.totalTime || 0) + (rider.penaltyMs || 0);
+      const totalTimeStr = formatLapTime(totalWithPen);
+      const penaltyStr = rider.penaltyMs ? ` (+${formatLapTime(rider.penaltyMs)})` : '';
       const displayName = `${rider.name}#${rider.number}`;
-      const avgMs = rider.laps > 0 ? Math.floor((rider.totalTime || 0) / rider.laps) : null;
+      const avgMs = rider.laps > 0 ? Math.floor(totalWithPen / rider.laps) : null;
       const avgStr = avgMs ? formatLapTime(avgMs) : '--:--';
 
       html += `
@@ -234,8 +239,9 @@ function generateFinalResultsHTML(race) {
           <td class="position">${position}</td>
           <td class="name">${displayName}</td>
           <td class="lap-times">${lapTimesStr}</td>
-          <td class="total-time">${totalTimeStr}</td>
+          <td class="total-time">${totalTimeStr}${penaltyStr}</td>
           <td class="avg-time">${avgStr}</td>
+          <td class="penalty-time">${rider.penaltyMs ? '+' + formatLapTime(rider.penaltyMs) : '--:--'}</td>
         </tr>
       `;
     });
@@ -445,7 +451,8 @@ wss.on('connection', (ws) => {
               totalTime: 0,
               lastLapTime: null,
               previousLapTime: null,
-              isActive: true
+              isActive: true,
+              penaltyMs: 0
             };
             currentRace.riders.push(newRider);
             updateCurrentLap(currentRace);
@@ -656,6 +663,21 @@ wss.on('connection', (ws) => {
             raceForRemoveClass.riders = raceForRemoveClass.riders.map(r => (
               r.class === name ? { ...r, class: '' } : r
             ));
+            saveData();
+            broadcast({ type: 'state', data: raceState });
+          }
+          break;
+
+        case 'addPenalty':
+          const raceForPenalty = getCurrentRace();
+          if (raceForPenalty) {
+            raceForPenalty.riders = raceForPenalty.riders.map(r => {
+              if (r.id === data.riderId) {
+                return { ...r, penaltyMs: (r.penaltyMs || 0) + 5000 };
+              }
+              return r;
+            });
+            updatePositionsOnly(raceForPenalty);
             saveData();
             broadcast({ type: 'state', data: raceState });
           }

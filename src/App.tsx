@@ -367,6 +367,16 @@ const App: React.FC = () => {
                                   >
                                     -1
                                   </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      raceDatabase.addPenalty(rider.id);
+                                    }}
+                                    disabled={!currentRace.isRunning}
+                                    className="btn btn-penalty btn-inline-penalty"
+                                  >
+                                    +5s
+                                  </button>
                                 </div>
                               </div>
                             ))}
@@ -436,6 +446,7 @@ const App: React.FC = () => {
                           <th>IMIĘ</th>
                           <th>OKRĄŻENIA</th>
                           <th>ŁĄCZNY CZAS</th>
+                          <th>KARA</th>
                           <th>POPRZEDNIE OKRĄŻENIE</th>
                         </tr>
                       </thead>
@@ -448,7 +459,8 @@ const App: React.FC = () => {
                             <td className="number">#{rider.number}</td>
                             <td className="name">{rider.name}</td>
                             <td className="laps">{rider.laps}</td>
-                            <td className="total-time">{formatTotalTime(rider.totalTime)}</td>
+                            <td className="total-time">{formatTotalTime((rider.totalTime || 0) + (rider.penaltyMs || 0))}</td>
+                            <td className="penalty-time">{rider.penaltyMs ? `+${formatLapTime(rider.penaltyMs)}` : '--:--'}</td>
                             <td className="last-lap">{formatLapTime(rider.previousLapTime)}</td>
                           </tr>
                         ))}

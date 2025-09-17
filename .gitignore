@@ -67,4 +67,4 @@ android/app/release/
 *.orig.*
 web-build/
 
-
+server/race_data.json  

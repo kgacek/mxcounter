@@ -1015,6 +1015,19 @@ html, body, #root, .app, .viewer-app {
   z-index: 1;
 }
 
+/* Penalty button next to -1 */
+.btn-inline-penalty {
+  position: absolute !important;
+  right: 52px !important; /* leave space left of -1 button */
+  bottom: 8px !important;
+  background: #E65100 !important; /* deep orange */
+  color: #FFFFFF !important;
+  padding: 0.2rem 0.48rem !important;
+  font-size: 0.88rem !important;
+  border-radius: 6px !important;
+  z-index: 1;
+}
+
 /* Keep rider number prominent as before */
 .rider-number {
   font-size: 3rem;
